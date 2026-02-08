@@ -6,7 +6,7 @@ pipeline {
         CONTAINER_NAME = "react-app"
         IMAGE_NAME = "my-react-image"
         EMAIL = "yashmp01234@gmail.com"
-        PORT = "5173"
+        PORT = "80"
     }
 
     stages {
