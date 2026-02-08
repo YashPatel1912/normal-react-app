@@ -32,15 +32,15 @@ pipeline {
 
         stage("Build Docker image") {
             steps {
-                bat 'docker build -t $IMAGE_NAME .'
+                bat 'docker build -t %IMAGE_NAME% .'
             }
         }
 
         stage("Stop & Remove previous container") {
             steps {
                 bat '''
-                    docker stop $CONTAINER_NAME || true
-                    docker rm $CONTAINER_NAME || true
+                    docker stop %CONTAINER_NAME% || true
+                    docker rm %CONTAINER_NAME% || true
 
                 '''
             }
@@ -49,7 +49,7 @@ pipeline {
         stage("Docker container Run") {
             steps {
                 bat '''
-                    docker run -d -p ${PORT}:${PORT} --name $CONTAINER_NAME $IMAGE_NAME
+                    docker run -d -p %PORT%:%PORT% --name $CONTAINER_NAME %IMAGE_NAME%
 
                 '''
             }
@@ -69,7 +69,7 @@ pipeline {
 
          stage('Deploy to Vercel') {
             steps {
-                bat 'npx vercel --prod --yes --token=$VERCEL_TOKEN'
+                bat 'npx vercel --prod --yes --token=%VERCEL_TOKEN%'
             }
         }
     }
