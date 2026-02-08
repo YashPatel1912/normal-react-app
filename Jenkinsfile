@@ -18,13 +18,13 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                bat 'npm install'
             }
         }
 
         stage('Build React App') {
             steps {
-                sh 'npm run build'
+                bat 'npm run build'
             }
         }
 
@@ -32,13 +32,13 @@ pipeline {
 
         stage("Build Docker image") {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
+                bat 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage("Stop & Remove previous container") {
             steps {
-                sh '''
+                bat '''
                     docker stop $CONTAINER_NAME || true
                     docker rm $CONTAINER_NAME || true
 
@@ -48,7 +48,7 @@ pipeline {
         
         stage("Docker container Run") {
             steps {
-                sh '''
+                bat '''
                     docker run -d -p ${PORT}:${PORT} --name $CONTAINER_NAME $IMAGE_NAME
 
                 '''
@@ -69,7 +69,7 @@ pipeline {
 
          stage('Deploy to Vercel') {
             steps {
-                sh 'npx vercel --prod --yes --token=$VERCEL_TOKEN'
+                bat 'npx vercel --prod --yes --token=$VERCEL_TOKEN'
             }
         }
     }
