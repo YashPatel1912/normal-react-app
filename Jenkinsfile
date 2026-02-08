@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         VERCEL_TOKEN   = credentials('vercel_token')
-        VERCEL_URL     = "https://normal-react-app.vercel.app"
+        VERCEL_URL     = ""
         CONTAINER_NAME = "react-app"
         IMAGE_NAME     = "my-react-image"
         EMAIL          = "yashmp01234@gmail.com"
@@ -46,9 +46,17 @@ pipeline {
 
         /* ================= VERCEL DEPLOY ================= */
 
-        stage("Deploy to Vercel") {
+        stage('Deploy to Vercel') {
             steps {
-                bat 'npx vercel --prod --yes --token=%VERCEL_TOKEN%'
+                bat '''
+                npx vercel --prod --yes --token=%VERCEL_TOKEN% > vercel_output.txt
+                '''
+                script {
+                    env.VERCEL_URL = readFile('vercel_output.txt')
+                        .readLines()
+                        .find { it.contains("https://") }
+                        .trim()
+                }
             }
         }
     }
@@ -58,46 +66,46 @@ pipeline {
             emailext(
                 subject: "🚀 React App Deployed Successfully",
                 body: """
-Hello Yash,
+                    Hello Yash,
 
-Your React application has been deployed successfully 🎉
+                    Your React application has been deployed successfully 🎉
 
-🔹 Docker Details:
-• Image Name   : ${IMAGE_NAME}
-• Container    : ${CONTAINER_NAME}
-• Port         : ${PORT}
+                    🔹 Docker Details:
+                    • Image Name   : ${IMAGE_NAME}
+                    • Container    : ${CONTAINER_NAME}
+                    • Port         : ${PORT}
 
-🔹 Vercel Deployment:
-🌐 Live URL: ${VERCEL_URL}
+                    🔹 Vercel Deployment:
+                    🌐 Live URL: ${VERCEL_URL}
 
-Regards,
-Jenkins CI/CD
-""",
-                to: "${EMAIL}"
-            )
+                    Regards,
+                    Jenkins CI/CD
+                    """,
+                                    to: "${EMAIL}"
+                                )
 
-            echo "✅ Docker + Vercel deployment successful"
+                                echo "✅ Docker + Vercel deployment successful"
         }
 
         failure {
             emailext(
                 subject: "❌ React App Deployment Failed",
                 body: """
-Hello Yash,
+                    Hello Yash,
 
-The Jenkins pipeline failed ❌
-Please check the Jenkins console logs.
+                    The Jenkins pipeline failed ❌
+                    Please check the Jenkins console logs.
 
-Job: ${env.JOB_NAME}
-Build: #${env.BUILD_NUMBER}
+                    Job: ${env.JOB_NAME}
+                    Build: #${env.BUILD_NUMBER}
 
-Regards,
-Jenkins CI/CD
-""",
-                to: "${EMAIL}"
-            )
+                    Regards,
+                    Jenkins CI/CD
+                    """,
+                                    to: "${EMAIL}"
+                                )
 
-            echo "❌ Pipeline failed"
+                                echo "❌ Pipeline failed"
         }
     }
 }
