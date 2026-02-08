@@ -48,14 +48,21 @@ pipeline {
 
         stage('Deploy to Vercel') {
             steps {
-                bat '''
-                npx vercel --prod --yes --token=%VERCEL_TOKEN% > vercel_output.txt
-                '''
                 script {
-                    env.VERCEL_URL = readFile('vercel_output.txt')
-                        .readLines()
-                        .find { it.contains("https://") }
-                        .trim()
+                    def output = bat(
+                        script: 'npx vercel --prod --yes --token=%VERCEL_TOKEN%',
+                        returnStdout: true
+                    )
+
+                    echo output
+
+                    def matcher = output =~ /(https:\/\/[a-zA-Z0-9-]+\.vercel\.app)/
+
+                    if (matcher.find()) {
+                        env.VERCEL_URL = matcher.group(1)
+                    } else {
+                        env.VERCEL_URL = "URL_NOT_FOUND"
+                    }
                 }
             }
         }
