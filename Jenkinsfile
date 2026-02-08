@@ -16,18 +16,6 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                bat 'npm install'
-            }
-        }
-
-        stage('Build React App') {
-            steps {
-                bat 'npm run build'
-            }
-        }
-
         /* ================= DOCKER BUILD ================= */
 
         stage("Build Docker image") {
@@ -39,8 +27,8 @@ pipeline {
         stage("Stop & Remove previous container") {
             steps {
                 bat '''
-                    docker stop %CONTAINER_NAME% || true
-                    docker rm %CONTAINER_NAME% || true
+                    docker stop %CONTAINER_NAME% || exit 0
+                    docker rm %CONTAINER_NAME% || exit 0
 
                 '''
             }
@@ -49,8 +37,7 @@ pipeline {
         stage("Docker container Run") {
             steps {
                 bat '''
-                    docker run -d -p %PORT%:%PORT% --name $CONTAINER_NAME %IMAGE_NAME%
-
+                    docker run -d -p %PORT%:%PORT% --name %CONTAINER_NAME% %IMAGE_NAME%
                 '''
             }
         }
