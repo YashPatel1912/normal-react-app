@@ -69,50 +69,34 @@ pipeline {
     }
 
     post {
-        success {
-            emailext(
-                subject: "🚀 React App Deployed Successfully",
-                body: """
-                    Hello Yash,
+    success {
+        emailext(
+            subject: "🚀 React App Deployed Successfully",
+            body: """
+Hello Yash,
 
-                    Your React application has been deployed successfully 🎉
+Your React application has been deployed successfully 🎉
 
-                    🔹 Docker Details:
-                    • Image Name   : ${IMAGE_NAME}
-                    • Container    : ${CONTAINER_NAME}
-                    • Port         : ${PORT}
+🔹 Docker Details:
+• Image Name   : ${IMAGE_NAME}
+• Container    : ${CONTAINER_NAME}
+• Port         : ${PORT}
 
-                    🔹 Vercel Deployment:
-                    🌐 Live URL: ${VERCEL_URL}
+🔹 Vercel Deployment:
+🌐 Live URL: ${env.VERCEL_URL}
 
-                    Regards,
-                    Jenkins CI/CD
-                    """,
-                                    to: "${EMAIL}"
-                                )
+Regards,
+Jenkins CI/CD
+""",
+            to: "${EMAIL}"
+        )
 
-                                echo "✅ Docker + Vercel deployment successful"
-        }
-
-        failure {
-            emailext(
-                subject: "❌ React App Deployment Failed",
-                body: """
-                    Hello Yash,
-
-                    The Jenkins pipeline failed ❌
-                    Please check the Jenkins console logs.
-
-                    Job: ${env.JOB_NAME}
-                    Build: #${env.BUILD_NUMBER}
-
-                    Regards,
-                    Jenkins CI/CD
-                    """,
-                                    to: "${EMAIL}"
-                                )
-
-                                echo "❌ Pipeline failed"
-        }
+        echo "✅ Docker + Vercel deployment successful"
     }
+
+    failure {
+        echo "❌ Pipeline failed"
+    }
+}
+
 }
